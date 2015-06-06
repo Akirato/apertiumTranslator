@@ -11,14 +11,17 @@ def translate(sentence,langPair):
         translated = Popen('echo "'+sentence+'" | '+'apertium '+'en-ca',shell=True,stdout=PIPE,stderr=STDOUT).communicate()[0].decode('utf-8')
     except:
         raise RuntimeError("Apertium or its module for the given language pair is not installed properly.\n Try running 'echo <sentence> | apertium langPair.\n If this doesn't give any Error, then try running the program again.\n Else install Apertium and the required language pair.'")
-    print("sentence:",sentence,'\n',translated)
     return translated
+
 
 def translateSRT(filePath,langPair):
     fileContent = open(filePath,"r").read()
     fileLines = fileContent.splitlines()
     outputFile=open(filePath[:-4]+"_"+langPair+'.srt',"w")
+    length,h = len(fileLines),1
     for i in fileLines:
+        print("Translating: "+str(h)+"/"+str(length)+" lines.")
+        h = h + 1
         if not(i.startswith("<") or (len(i)>0 and i[0].isdigit())):
             print((translate(i,langPair).encode('utf-8')),file=outputFile)
         else:
@@ -39,7 +42,8 @@ if __name__ == "__main__":
             else:
                 print("Give the language pair for translation. Argument 'all' to get all language pairs.")
         elif (len(sys.argv)) > 2:    
-            translateSRT(sys.argv[1],sys.argv[2])
+             print("This can take several minutes depending on your system.")
+             translateSRT(sys.argv[1],sys.argv[2])
        
   
     elif _platform == "win32":
